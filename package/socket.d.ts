@@ -7,6 +7,12 @@ export declare class DMDataWebSocket {
     private SOCKET;
     private debug;
     private logger;
+    /**
+     * A Project DM-D.S.S WebSocket handler/wrapper
+     * @param api_key Your Project DM-D.S.S API key
+     * @param application_name The application name you would like to use
+     * @param debug Whether debug information should be logged.
+     */
     constructor(api_key: string, application_name?: string, debug?: boolean);
     private fetchTicket;
     private handlePing;

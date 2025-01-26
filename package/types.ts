@@ -102,3 +102,47 @@ export enum WebSocketRegion {
     OSAKA_AWS_003 = 'ws003',
     OSAKA_AWS_004 = 'ws004'
 }
+
+export interface DataMessage {
+    "type":'data',
+    "version":string,
+    "id":string,
+    "originalId":string,
+    "classification":Classification,
+    "passing":Array<{name:string,time:string}>,
+    "head":{
+        "type":DataTypeCode,
+        "author":string,
+        "time":string,
+        "designation":unknown,
+        "test":boolean
+    },
+    "xmlReport":{
+        "control":{
+            "title":string,
+            "dateTime":string,
+            "status":string,
+            "editorialOffice":string,
+            "publishingOffice":string
+        },
+        "head":{
+            "title":string,
+            "reportDateTime":string,
+            "targetDateTime":string,
+            "eventId":string,
+            "serial":string,
+            "infoType":string,
+            "infoKind":string,
+            "infoKindVersion":string,
+            "headline":string
+        }
+    },
+    "format":'json',
+    "schema":{
+        "type":string,
+        "version":string
+    },
+    "compression": 'gzip',
+    "encoding": 'base64',
+    "body": string
+}

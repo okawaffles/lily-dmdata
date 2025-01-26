@@ -13,6 +13,12 @@ export class DMDataWebSocket {
     private debug: boolean;
     private logger: Logger;
 
+    /**
+     * A Project DM-D.S.S WebSocket handler/wrapper
+     * @param api_key Your Project DM-D.S.S API key
+     * @param application_name The application name you would like to use
+     * @param debug Whether debug information should be logged.
+     */
     constructor(api_key: string, application_name: string = 'dmdata-application', debug: boolean = false) {
         this.API_KEY_HEADER = `Basic ${btoa(api_key)}`;
         this.ApplicationName = application_name;
@@ -59,6 +65,7 @@ export class DMDataWebSocket {
         const data = JSON.parse(message);
         if (data.type == 'ping') return this.handlePing(data.pingId);
         if (data.type == 'start') return this.handleStart(data);
+        if (data.type == 'data') return this.handleData(data);
     }
 
     private handleStart(data: StartData) {
@@ -68,6 +75,10 @@ export class DMDataWebSocket {
         this.socket_id = data.socketId;
 
         this.emit(WebSocketEvent.START);
+    }
+
+    private handleData(data: any) {
+        
     }
 
     // -- emitter -- //
@@ -102,7 +113,7 @@ export class DMDataWebSocket {
     }) {
         const ticket = await this.fetchTicket(options.classifications, options.data_types || [], options.include_tests || false);
 
-        if (this.debug) this.logger.debug(`connecting websocket to 'wss://${options.region || WebSocketRegion.AUTOMATIC}.api.dmdata.jp/v2/websocket?ticket=${ticket?.ticket.substring(0,3)}###' ...`);
+        if (this.debug) this.logger.debug(`connecting websocket to 'wss://${options.region || WebSocketRegion.AUTOMATIC}.api.dmdata.jp/v2/websocket?ticket=${ticket?.ticket.substring(0,6)}###' ...`);
 
         this.SOCKET = new WebSocket(`wss://${options.region || WebSocketRegion.AUTOMATIC}.api.dmdata.jp/v2/websocket?ticket=${ticket?.ticket}`);
 

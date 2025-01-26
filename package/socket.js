@@ -15,6 +15,12 @@ const events_1 = require("events");
 const types_1 = require("./types");
 const ws_1 = require("ws");
 class DMDataWebSocket {
+    /**
+     * A Project DM-D.S.S WebSocket handler/wrapper
+     * @param api_key Your Project DM-D.S.S API key
+     * @param application_name The application name you would like to use
+     * @param debug Whether debug information should be logged.
+     */
     constructor(api_key, application_name = 'dmdata-application', debug = false) {
         this.is_active = false;
         this.socket_id = -1;
@@ -92,7 +98,7 @@ class DMDataWebSocket {
         return __awaiter(this, void 0, void 0, function* () {
             const ticket = yield this.fetchTicket(options.classifications, options.data_types || [], options.include_tests || false);
             if (this.debug)
-                this.logger.debug(`connecting websocket to 'wss://${options.region || types_1.WebSocketRegion.AUTOMATIC}.api.dmdata.jp/v2/websocket?ticket=${ticket === null || ticket === void 0 ? void 0 : ticket.ticket.substring(0, 3)}###' ...`);
+                this.logger.debug(`connecting websocket to 'wss://${options.region || types_1.WebSocketRegion.AUTOMATIC}.api.dmdata.jp/v2/websocket?ticket=${ticket === null || ticket === void 0 ? void 0 : ticket.ticket.substring(0, 6)}###' ...`);
             this.SOCKET = new ws_1.WebSocket(`wss://${options.region || types_1.WebSocketRegion.AUTOMATIC}.api.dmdata.jp/v2/websocket?ticket=${ticket === null || ticket === void 0 ? void 0 : ticket.ticket}`);
             this.SOCKET.on('message', (msg) => this.handleMessage(msg.toString()));
             this.emit(types_1.WebSocketEvent.OPENED);
