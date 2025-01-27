@@ -14,6 +14,7 @@ const okayulogger_1 = require("okayulogger");
 const events_1 = require("events");
 const types_1 = require("./types");
 const ws_1 = require("ws");
+const decompressor_1 = require("./decompressor");
 class DMDataWebSocket {
     /**
      * A Project DM-D.S.S WebSocket handler/wrapper
@@ -70,6 +71,8 @@ class DMDataWebSocket {
             return this.handlePing(data.pingId);
         if (data.type == 'start')
             return this.handleStart(data);
+        if (data.type == 'data')
+            return this.handleData(data);
     }
     handleStart(data) {
         this.is_active = true;
@@ -77,6 +80,12 @@ class DMDataWebSocket {
             this.logger.debug('websocket opened successfully!');
         this.socket_id = data.socketId;
         this.emit(types_1.WebSocketEvent.START);
+    }
+    handleData(data) {
+        // must decode body first
+        const decoded_body = (0, decompressor_1.DecompressData)(data.body);
+        if (decoded_body._schema.type == types_1.SchemaType.EARTHQUAKE_INFORMATION)
+            this.emitter.emit(types_1.WebSocketEvent.EARTHQUAKE_REPORT, decoded_body);
     }
     on(event_name, listener) {
         this.emitter.on(event_name, listener);

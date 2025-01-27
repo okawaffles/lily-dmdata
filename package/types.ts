@@ -142,7 +142,25 @@ export interface DataMessage {
         "type":string,
         "version":string
     },
-    "compression": 'gzip',
-    "encoding": 'base64',
+    "compression": 'gzip' | unknown,
+    "encoding": 'base64' | unknown,
     "body": string
+}
+
+
+export enum ShindoValue {
+    ZERO = '0',
+    ONE = '1',
+    TWO = '2',
+    THREE = '3',
+    FOUR = '4',
+    FIVE_LOWER = '5-',
+    FIVE_UPPER = '5+',
+    SIX_LOWER = '6-',
+    SIX_UPPER = '6+',
+    SEVEN = '7'
+}
+
+export enum SchemaType {
+    EARTHQUAKE_INFORMATION = 'earthquake-information'
 }

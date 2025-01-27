@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WebSocketRegion = exports.WebSocketEvent = exports.DataTypeCode = exports.Classification = void 0;
+exports.SchemaType = exports.ShindoValue = exports.WebSocketRegion = exports.WebSocketEvent = exports.DataTypeCode = exports.Classification = void 0;
 var Classification;
 (function (Classification) {
     Classification["TELEGRAM_WEATHER"] = "telegram.weather";
@@ -66,3 +66,20 @@ var WebSocketRegion;
     WebSocketRegion["OSAKA_AWS_003"] = "ws003";
     WebSocketRegion["OSAKA_AWS_004"] = "ws004";
 })(WebSocketRegion || (exports.WebSocketRegion = WebSocketRegion = {}));
+var ShindoValue;
+(function (ShindoValue) {
+    ShindoValue["ZERO"] = "0";
+    ShindoValue["ONE"] = "1";
+    ShindoValue["TWO"] = "2";
+    ShindoValue["THREE"] = "3";
+    ShindoValue["FOUR"] = "4";
+    ShindoValue["FIVE_LOWER"] = "5-";
+    ShindoValue["FIVE_UPPER"] = "5+";
+    ShindoValue["SIX_LOWER"] = "6-";
+    ShindoValue["SIX_UPPER"] = "6+";
+    ShindoValue["SEVEN"] = "7";
+})(ShindoValue || (exports.ShindoValue = ShindoValue = {}));
+var SchemaType;
+(function (SchemaType) {
+    SchemaType["EARTHQUAKE_INFORMATION"] = "earthquake-information";
+})(SchemaType || (exports.SchemaType = SchemaType = {}));

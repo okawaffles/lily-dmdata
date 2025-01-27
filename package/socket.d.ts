@@ -18,6 +18,7 @@ export declare class DMDataWebSocket {
     private handlePing;
     private handleMessage;
     private handleStart;
+    private handleData;
     private emitter;
     on(event_name: WebSocketEvent, listener: (...args: any[]) => void): void;
     off(event_name: WebSocketEvent, listener: (...args: any[]) => void): void;

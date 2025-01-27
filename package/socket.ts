@@ -1,7 +1,9 @@
 import { Logger } from 'okayulogger';
 import { EventEmitter } from 'events';
-import { Classification, DataTypeCode, StartData, WebSocketEvent, WebSocketRegion, WSTicket } from './types';
+import { Classification, DataMessage, DataTypeCode, SchemaType, StartData, WebSocketEvent, WebSocketRegion, WSTicket } from './types';
 import { WebSocket } from 'ws';
+import { DecompressData } from './decompressor';
+import { EarthquakeInformationSchema } from './schema';
 
 export class DMDataWebSocket {
     public ApplicationName: string;
@@ -77,8 +79,12 @@ export class DMDataWebSocket {
         this.emit(WebSocketEvent.START);
     }
 
-    private handleData(data: any) {
-        
+    private handleData(data: DataMessage) {
+        // must decode body first
+        const decoded_body = DecompressData(data.body);
+
+        if (decoded_body._schema.type == SchemaType.EARTHQUAKE_INFORMATION) 
+            this.emitter.emit(WebSocketEvent.EARTHQUAKE_REPORT, <unknown>decoded_body as EarthquakeInformationSchema);
     }
 
     // -- emitter -- //
