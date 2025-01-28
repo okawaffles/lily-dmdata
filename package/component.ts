@@ -70,3 +70,22 @@ export interface CommentsComponent {
         codes: Array<string>
     }
 }
+
+// TODO: check docs to see if some of these
+// have static/enum-able values
+export interface DefaultComponent {
+    type: string,
+    title: string,
+    status: string,
+    infoType: string,
+    editorialOffice: string,
+    publishingOffice: Array<string>,
+    pressDateTime: string,
+    reportDateTime: string,
+    targetDateTime: string,
+    eventId: string,
+    serialNo: string,
+    infoKind: string,
+    infoKindVersion: string,
+    headline: string | null,
+}
