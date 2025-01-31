@@ -1,0 +1,6 @@
+data_inspecting.json
+data_logs
+.ENV
+test/data_inspecting.json
+test/data_logs
+package/
