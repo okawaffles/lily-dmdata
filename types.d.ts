@@ -152,5 +152,6 @@ export declare enum ShindoValue {
     SEVEN = "7"
 }
 export declare enum SchemaType {
-    EARTHQUAKE_INFORMATION = "earthquake-information"
+    EARTHQUAKE_INFORMATION = "earthquake-information",
+    EEW_INFORMATION = "eew-information"
 }

@@ -84,9 +84,12 @@ class DMDataWebSocket {
     handleData(data) {
         // must decode body first
         const decoded_body = (0, decompressor_1.DecompressData)(data.body);
-        this.logger.debug('body decompressed to -> ' + decoded_body);
+        this.logger.debug('body decompressed to -> ' + JSON.stringify(decoded_body));
+        // final report of an earthquake (jquake says the line)
         if (decoded_body._schema.type == types_1.SchemaType.EARTHQUAKE_INFORMATION)
-            this.emitter.emit(types_1.WebSocketEvent.EARTHQUAKE_REPORT, decoded_body);
+            this.emitter.emit(types_1.WebSocketEvent.EARTHQUAKE_REPORT, decoded_body.body);
+        // forecast is issued
+        // if (decoded_body._schema.type == 'a')
     }
     on(event_name, listener) {
         this.emitter.on(event_name, listener);

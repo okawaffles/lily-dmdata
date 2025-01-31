@@ -11,6 +11,6 @@ export interface EEWInformationSchema extends DefaultComponent {
     body: {
         isLastInfo: boolean;
         isCanceled: boolean;
-        text: string;
+        isWarning: boolean;
     };
 }

@@ -82,4 +82,5 @@ var ShindoValue;
 var SchemaType;
 (function (SchemaType) {
     SchemaType["EARTHQUAKE_INFORMATION"] = "earthquake-information";
+    SchemaType["EEW_INFORMATION"] = "eew-information";
 })(SchemaType || (exports.SchemaType = SchemaType = {}));

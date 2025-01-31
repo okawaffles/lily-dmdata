@@ -14,6 +14,13 @@ export interface EEWInformationSchema extends DefaultComponent {
     body: {
         isLastInfo: boolean,
         isCanceled: boolean,
-        text: string
+        isWarning: boolean,
+        earthquake: {
+            originTime: string,
+            arrivalTime: string,
+            hypocenter: {
+                code: string
+            }
+        }
     }
 }

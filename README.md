@@ -21,7 +21,7 @@ SOCKET.on(WebSocketEvent.START, () => {
 });
 
 SOCKET.on(WebSocketEvent.EARTHQUAKE_REPORT, (data: EarthquakeInformationSchema) => {
-    console.log(`A new earthquake has been reported! It's maximum intensity was ${data.maxInt}.`);
+    console.log(`A new earthquake has been reported! It's maximum intensity was ${data.intensity.maxInt}.`);
 });
 
 // Open the socket and start listening.
@@ -34,3 +34,10 @@ SOCKET.OpenSocket({
     ]
 });
 ```
+
+## Want to help out? Here's some things I need done:
+- Clean up the code a bit
+- Document functions
+- Bug-hunting
+
+Bug-hunting specifically is a tricky one, since we never know when earthquakes will occur or what their outcomes will be.
