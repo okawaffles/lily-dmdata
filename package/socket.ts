@@ -14,6 +14,7 @@ export class DMDataWebSocket {
     private SOCKET!: WebSocket;
     private debug: boolean;
     private logger: Logger;
+    private emitter = new EventEmitter();
 
     /**
      * A Project DM-D.S.S WebSocket handler/wrapper
@@ -93,16 +94,14 @@ export class DMDataWebSocket {
 
         // eew-information is issued, can be either warning or forecast
         if (decoded_body._schema.type == SchemaType.EEW_INFORMATION) {
-            const eew_body = decoded_body as EEWInformationSchemaBody;
+            const eew_body = decoded_body.body;
             // must determine whether it's a forecast or warning to emit the proper event
-            if (eew_body.type == EEW_TYPE.FORECAST) this.emitter.emit(WebSocketEvent.EEW_FORECAST, eew_body);
-            if (eew_body.type == EEW_TYPE.WARNING) this.emitter.emit(WebSocketEvent.EEW_WARNING, eew_body); // THIS IS NOT WORKING AND I DONT KNOW WHY!!!!
+            if (decoded_body.type == EEW_TYPE.FORECAST) this.emitter.emit(WebSocketEvent.EEW_FORECAST, eew_body);
+            if (decoded_body.type == EEW_TYPE.WARNING) this.emitter.emit(WebSocketEvent.EEW_WARNING, eew_body); // decoded_body IS NOT WORKING AND I DONT KNOW WHY!!!!
         }
     }
 
     // -- emitter -- //
-
-    private emitter = new EventEmitter();
 
     on(event_name: WebSocketEvent, listener: (...args: any[]) => void): void {
         this.emitter.on(event_name, listener);
@@ -138,13 +137,24 @@ export class DMDataWebSocket {
         this.SOCKET = new WebSocket(`wss://${options.region || WebSocketRegion.AUTOMATIC}.api.dmdata.jp/v2/websocket?ticket=${ticket?.ticket}`);
 
         this.SOCKET.on('message', (msg) => this.handleMessage(msg.toString()));
+        this.SOCKET.on('close', () => { 
+            if (!this.is_active) return;
+            this.emitter.emit(WebSocketEvent.CLOSED);
+            this.is_active = false; 
+        });
 
         this.emit(WebSocketEvent.OPENED);
     }
 
+    public async CloseSocket() {
+        if (!this.is_active) return this.logger.warn('CloseSocket() was called, but no socket is currently active.');
+
+        this.SOCKET.close();
+    }
+
     /**
      * Manually send a message to the internal message handler. Useful for testing purposes.
-     * @param message The message to be "sent"
+     * @param message The message to be passed to the handler
      */
     public EmulateMessageInternally(message: string) {
         if (this.debug) this.logger.debug('emulating a message by passing directly to handleMessage()');

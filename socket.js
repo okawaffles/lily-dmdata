@@ -25,7 +25,6 @@ class DMDataWebSocket {
     constructor(api_key, application_name = 'dmdata-application', debug = false) {
         this.is_active = false;
         this.socket_id = -1;
-        // -- emitter -- //
         this.emitter = new events_1.EventEmitter();
         this.API_KEY_HEADER = `Basic ${btoa(api_key)}`;
         this.ApplicationName = application_name;
@@ -91,13 +90,15 @@ class DMDataWebSocket {
             this.emitter.emit(types_1.WebSocketEvent.EARTHQUAKE_REPORT, decoded_body.body);
         // eew-information is issued, can be either warning or forecast
         if (decoded_body._schema.type == types_1.SchemaType.EEW_INFORMATION) {
-            const eew_body = decoded_body;
+            const eew_body = decoded_body.body;
             // must determine whether it's a forecast or warning to emit the proper event
-            if (eew_body.type == types_1.EEW_TYPE.FORECAST)
+            if (decoded_body.type == types_1.EEW_TYPE.FORECAST)
                 this.emitter.emit(types_1.WebSocketEvent.EEW_FORECAST, eew_body);
-            this.emitter.emit(types_1.WebSocketEvent.EEW_WARNING, eew_body);
+            if (decoded_body.type == types_1.EEW_TYPE.WARNING)
+                this.emitter.emit(types_1.WebSocketEvent.EEW_WARNING, eew_body); // decoded_body IS NOT WORKING AND I DONT KNOW WHY!!!!
         }
     }
+    // -- emitter -- //
     on(event_name, listener) {
         this.emitter.on(event_name, listener);
     }
@@ -123,12 +124,25 @@ class DMDataWebSocket {
                 this.logger.debug(`connecting websocket to 'wss://${options.region || types_1.WebSocketRegion.AUTOMATIC}.api.dmdata.jp/v2/websocket?ticket=${ticket === null || ticket === void 0 ? void 0 : ticket.ticket.substring(0, 6)}###' ...`);
             this.SOCKET = new ws_1.WebSocket(`wss://${options.region || types_1.WebSocketRegion.AUTOMATIC}.api.dmdata.jp/v2/websocket?ticket=${ticket === null || ticket === void 0 ? void 0 : ticket.ticket}`);
             this.SOCKET.on('message', (msg) => this.handleMessage(msg.toString()));
+            this.SOCKET.on('close', () => {
+                if (!this.is_active)
+                    return;
+                this.emitter.emit(types_1.WebSocketEvent.CLOSED);
+                this.is_active = false;
+            });
             this.emit(types_1.WebSocketEvent.OPENED);
+        });
+    }
+    CloseSocket() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.is_active)
+                return this.logger.warn('CloseSocket() was called, but no socket is currently active.');
+            this.SOCKET.close();
         });
     }
     /**
      * Manually send a message to the internal message handler. Useful for testing purposes.
-     * @param message The message to be "sent"
+     * @param message The message to be passed to the handler
      */
     EmulateMessageInternally(message) {
         if (this.debug)

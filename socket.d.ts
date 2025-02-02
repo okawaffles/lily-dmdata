@@ -7,6 +7,7 @@ export declare class DMDataWebSocket {
     private SOCKET;
     private debug;
     private logger;
+    private emitter;
     /**
      * A Project DM-D.S.S WebSocket handler/wrapper
      * @param api_key Your Project DM-D.S.S API key
@@ -19,7 +20,6 @@ export declare class DMDataWebSocket {
     private handleMessage;
     private handleStart;
     private handleData;
-    private emitter;
     on(event_name: WebSocketEvent, listener: (...args: any[]) => void): void;
     off(event_name: WebSocketEvent, listener: (...args: any[]) => void): void;
     emit(event_name: WebSocketEvent, ...args: any[]): void;
@@ -33,9 +33,10 @@ export declare class DMDataWebSocket {
         include_tests?: boolean;
         region?: WebSocketRegion;
     }): Promise<void>;
+    CloseSocket(): Promise<void>;
     /**
      * Manually send a message to the internal message handler. Useful for testing purposes.
-     * @param message The message to be "sent"
+     * @param message The message to be passed to the handler
      */
     EmulateMessageInternally(message: string): void;
 }
