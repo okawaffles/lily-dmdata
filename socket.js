@@ -34,6 +34,8 @@ class DMDataWebSocket {
     }
     fetchTicket(classifications, data_types, include_tests) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (this.API_KEY_HEADER == `Basic dW5kZWZpbmVk`)
+                return this.logger.fatal('You have passed an undefined API Key. Please double-check your code/env variables.');
             const result = yield fetch('https://api.dmdata.jp/v2/socket', {
                 method: 'POST',
                 headers: {
@@ -49,8 +51,7 @@ class DMDataWebSocket {
             });
             const result_data = yield result.json();
             if (result_data.status != 'ok') {
-                if (this.debug)
-                    this.logger.debug(`(fetchTicket) failed to get websocket ticket: error ${result_data.error.code}: ${result_data.error.message}`);
+                this.logger.fatal(`(fetchTicket) failed to get websocket ticket: error ${result_data.error.code}: ${result_data.error.message}`);
                 return;
             }
             return result_data;
@@ -88,8 +89,14 @@ class DMDataWebSocket {
         // final report of an earthquake (jquake says the line)
         if (decoded_body._schema.type == types_1.SchemaType.EARTHQUAKE_INFORMATION)
             this.emitter.emit(types_1.WebSocketEvent.EARTHQUAKE_REPORT, decoded_body.body);
-        // forecast is issued
-        // if (decoded_body._schema.type == 'a')
+        // eew-information is issued, can be either warning or forecast
+        if (decoded_body._schema.type == types_1.SchemaType.EEW_INFORMATION) {
+            const eew_body = decoded_body;
+            // must determine whether it's a forecast or warning to emit the proper event
+            if (eew_body.type == types_1.EEW_TYPE.FORECAST)
+                this.emitter.emit(types_1.WebSocketEvent.EEW_FORECAST, eew_body);
+            this.emitter.emit(types_1.WebSocketEvent.EEW_WARNING, eew_body);
+        }
     }
     on(event_name, listener) {
         this.emitter.on(event_name, listener);
@@ -110,12 +117,23 @@ class DMDataWebSocket {
     OpenSocket(options) {
         return __awaiter(this, void 0, void 0, function* () {
             const ticket = yield this.fetchTicket(options.classifications, options.data_types || [], options.include_tests || false);
+            if (ticket == undefined)
+                return this.logger.error('Unable to open the websocket due to an invalid or missing ticket.');
             if (this.debug)
                 this.logger.debug(`connecting websocket to 'wss://${options.region || types_1.WebSocketRegion.AUTOMATIC}.api.dmdata.jp/v2/websocket?ticket=${ticket === null || ticket === void 0 ? void 0 : ticket.ticket.substring(0, 6)}###' ...`);
             this.SOCKET = new ws_1.WebSocket(`wss://${options.region || types_1.WebSocketRegion.AUTOMATIC}.api.dmdata.jp/v2/websocket?ticket=${ticket === null || ticket === void 0 ? void 0 : ticket.ticket}`);
             this.SOCKET.on('message', (msg) => this.handleMessage(msg.toString()));
             this.emit(types_1.WebSocketEvent.OPENED);
         });
+    }
+    /**
+     * Manually send a message to the internal message handler. Useful for testing purposes.
+     * @param message The message to be "sent"
+     */
+    EmulateMessageInternally(message) {
+        if (this.debug)
+            this.logger.debug('emulating a message by passing directly to handleMessage()');
+        this.handleMessage(message);
     }
 }
 exports.DMDataWebSocket = DMDataWebSocket;

@@ -1,9 +1,9 @@
 import { Logger } from 'okayulogger';
 import { EventEmitter } from 'events';
-import { Classification, DataMessage, DataTypeCode, SchemaType, StartData, WebSocketEvent, WebSocketRegion, WSTicket } from './types';
+import { Classification, DataMessage, DataTypeCode, EEW_TYPE, SchemaType, StartData, WebSocketEvent, WebSocketRegion, WSTicket } from './types';
 import { WebSocket } from 'ws';
 import { DecompressData } from './decompressor';
-import { EarthquakeInformationSchema } from './schema';
+import { EarthquakeInformationSchemaBody, EEWInformationSchemaBody } from './schema';
 
 export class DMDataWebSocket {
     public ApplicationName: string;
@@ -29,6 +29,8 @@ export class DMDataWebSocket {
     }
 
     private async fetchTicket(classifications: Array<Classification>, data_types: Array<DataTypeCode>, include_tests: boolean): Promise<WSTicket | undefined> {
+        if (this.API_KEY_HEADER == `Basic dW5kZWZpbmVk`) return this.logger.fatal('You have passed an undefined API Key. Please double-check your code/env variables.') as undefined;
+
         const result = await fetch('https://api.dmdata.jp/v2/socket', {
             method: 'POST',
             headers: {
@@ -46,7 +48,7 @@ export class DMDataWebSocket {
         const result_data: WSTicket = await result.json();
 
         if (result_data.status != 'ok') {
-            if (this.debug) this.logger.debug(`(fetchTicket) failed to get websocket ticket: error ${result_data.error.code}: ${result_data.error.message}`);
+            this.logger.fatal(`(fetchTicket) failed to get websocket ticket: error ${result_data.error.code}: ${result_data.error.message}`);
             return;
         }
 
@@ -87,10 +89,15 @@ export class DMDataWebSocket {
 
         // final report of an earthquake (jquake says the line)
         if (decoded_body._schema.type == SchemaType.EARTHQUAKE_INFORMATION) 
-            this.emitter.emit(WebSocketEvent.EARTHQUAKE_REPORT, <unknown>decoded_body.body as EarthquakeInformationSchema);
+            this.emitter.emit(WebSocketEvent.EARTHQUAKE_REPORT, decoded_body.body as EarthquakeInformationSchemaBody);
 
-        // forecast is issued
-        // if (decoded_body._schema.type == 'a')
+        // eew-information is issued, can be either warning or forecast
+        if (decoded_body._schema.type == SchemaType.EEW_INFORMATION) {
+            const eew_body = decoded_body as EEWInformationSchemaBody;
+            // must determine whether it's a forecast or warning to emit the proper event
+            if (eew_body.type == EEW_TYPE.FORECAST) this.emitter.emit(WebSocketEvent.EEW_FORECAST, eew_body);
+            if (eew_body.type == EEW_TYPE.WARNING) this.emitter.emit(WebSocketEvent.EEW_WARNING, eew_body); // THIS IS NOT WORKING AND I DONT KNOW WHY!!!!
+        }
     }
 
     // -- emitter -- //
@@ -124,6 +131,7 @@ export class DMDataWebSocket {
         region?: WebSocketRegion
     }) {
         const ticket = await this.fetchTicket(options.classifications, options.data_types || [], options.include_tests || false);
+        if (ticket == undefined) return this.logger.error('Unable to open the websocket due to an invalid or missing ticket.');
 
         if (this.debug) this.logger.debug(`connecting websocket to 'wss://${options.region || WebSocketRegion.AUTOMATIC}.api.dmdata.jp/v2/websocket?ticket=${ticket?.ticket.substring(0,6)}###' ...`);
 
@@ -132,5 +140,14 @@ export class DMDataWebSocket {
         this.SOCKET.on('message', (msg) => this.handleMessage(msg.toString()));
 
         this.emit(WebSocketEvent.OPENED);
+    }
+
+    /**
+     * Manually send a message to the internal message handler. Useful for testing purposes.
+     * @param message The message to be "sent"
+     */
+    public EmulateMessageInternally(message: string) {
+        if (this.debug) this.logger.debug('emulating a message by passing directly to handleMessage()');
+        this.handleMessage(message);
     }
 }

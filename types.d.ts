@@ -151,6 +151,14 @@ export declare enum ShindoValue {
     SIX_UPPER = "6+",
     SEVEN = "7"
 }
+export declare enum EEW_TYPE {
+    FORECAST = "\u7DCA\u6025\u5730\u9707\u901F\u5831\uFF08\u4E88\u5831\uFF09",
+    WARNING = "\u7DCA\u6025\u5730\u9707\u901F\u5831\uFF08\u8B66\u5831\uFF09"
+}
+export declare enum LAND_OR_SEA {
+    LAND = "\u5185\u9678",
+    SEA = "\u6D77\u57DF"
+}
 export declare enum SchemaType {
     EARTHQUAKE_INFORMATION = "earthquake-information",
     EEW_INFORMATION = "eew-information"

@@ -1,19 +1,19 @@
 import { ShindoValue } from "./types";
-interface QuakeDepth {
+export interface QuakeDepth {
     type: '深さ';
     unit: 'km';
     value: string;
 }
-interface HypocenterHeight {
+export interface HypocenterHeight {
     type: '高さ';
     unit: 'm';
     value: string;
 }
-interface LatLonCoordinate {
+export interface LatLonCoordinate {
     text: string;
     value: string;
 }
-interface Magnitude {
+export interface Magnitude {
     type: 'マグニチュード';
     value: string;
     unit: 'Mj';
@@ -52,16 +52,25 @@ export interface IntensityComponent {
     stations: Array<CodeNameIntensityStation>;
 }
 export interface CommentsComponent {
-    forecast: {
+    forecast?: {
         text: string;
         codes: Array<string>;
     };
-    var: {
+    warning?: {
+        text: string;
+        codes: Array<string>;
+    };
+    var?: {
         text: string;
         codes: Array<string>;
     };
 }
 export interface DefaultComponent {
+    _originalId: string;
+    _schema: {
+        type: string;
+        version: string;
+    };
     type: string;
     title: string;
     status: string;

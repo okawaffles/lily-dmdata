@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SchemaType = exports.ShindoValue = exports.WebSocketRegion = exports.WebSocketEvent = exports.DataTypeCode = exports.Classification = void 0;
+exports.SchemaType = exports.LAND_OR_SEA = exports.EEW_TYPE = exports.ShindoValue = exports.WebSocketRegion = exports.WebSocketEvent = exports.DataTypeCode = exports.Classification = void 0;
 var Classification;
 (function (Classification) {
     Classification["TELEGRAM_WEATHER"] = "telegram.weather";
@@ -79,6 +79,16 @@ var ShindoValue;
     ShindoValue["SIX_UPPER"] = "6+";
     ShindoValue["SEVEN"] = "7";
 })(ShindoValue || (exports.ShindoValue = ShindoValue = {}));
+var EEW_TYPE;
+(function (EEW_TYPE) {
+    EEW_TYPE["FORECAST"] = "\u7DCA\u6025\u5730\u9707\u901F\u5831\uFF08\u4E88\u5831\uFF09";
+    EEW_TYPE["WARNING"] = "\u7DCA\u6025\u5730\u9707\u901F\u5831\uFF08\u8B66\u5831\uFF09";
+})(EEW_TYPE || (exports.EEW_TYPE = EEW_TYPE = {}));
+var LAND_OR_SEA;
+(function (LAND_OR_SEA) {
+    LAND_OR_SEA["LAND"] = "\u5185\u9678";
+    LAND_OR_SEA["SEA"] = "\u6D77\u57DF";
+})(LAND_OR_SEA || (exports.LAND_OR_SEA = LAND_OR_SEA = {}));
 var SchemaType;
 (function (SchemaType) {
     SchemaType["EARTHQUAKE_INFORMATION"] = "earthquake-information";

@@ -161,6 +161,16 @@ export enum ShindoValue {
     SEVEN = '7'
 }
 
+export enum EEW_TYPE {
+    FORECAST = '緊急地震速報（予報）',
+    WARNING = '緊急地震速報（警報）',
+}
+
+export enum LAND_OR_SEA {
+    LAND = '内陸',
+    SEA = '海域'
+}
+
 export enum SchemaType {
     EARTHQUAKE_INFORMATION = 'earthquake-information',
     EEW_INFORMATION = 'eew-information'

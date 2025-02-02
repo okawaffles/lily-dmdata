@@ -33,4 +33,9 @@ export declare class DMDataWebSocket {
         include_tests?: boolean;
         region?: WebSocketRegion;
     }): Promise<void>;
+    /**
+     * Manually send a message to the internal message handler. Useful for testing purposes.
+     * @param message The message to be "sent"
+     */
+    EmulateMessageInternally(message: string): void;
 }
