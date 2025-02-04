@@ -95,6 +95,7 @@ export class DMDataWebSocket {
         // eew-information is issued, can be either warning or forecast
         if (decoded_body._schema.type == SchemaType.EEW_INFORMATION) {
             const eew_body = decoded_body.body;
+            eew_body.eventId = decoded_body.eventId; // pass the event id along as well for tracking
             // must determine whether it's a forecast or warning to emit the proper event
             if (decoded_body.type == EEW_TYPE.FORECAST) this.emitter.emit(WebSocketEvent.EEW_FORECAST, eew_body);
             if (decoded_body.type == EEW_TYPE.WARNING) this.emitter.emit(WebSocketEvent.EEW_WARNING, eew_body); // decoded_body IS NOT WORKING AND I DONT KNOW WHY!!!!
