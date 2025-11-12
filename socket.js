@@ -84,10 +84,13 @@ class DMDataWebSocket {
     handleData(data) {
         // must decode body first
         const decoded_body = (0, decompressor_1.DecompressData)(data.body);
-        this.logger.debug('body decompressed to -> ' + JSON.stringify(decoded_body));
+        if (this.debug)
+            this.logger.debug('body decompressed to -> ' + JSON.stringify(decoded_body));
         // final report of an earthquake (jquake says the line)
-        if (decoded_body._schema.type == types_1.SchemaType.EARTHQUAKE_INFORMATION)
+        if (decoded_body._schema.type == types_1.SchemaType.EARTHQUAKE_INFORMATION) {
+            decoded_body.body.eventId = decoded_body.eventId;
             this.emitter.emit(types_1.WebSocketEvent.EARTHQUAKE_REPORT, decoded_body.body);
+        }
         // eew-information is issued, can be either warning or forecast
         if (decoded_body._schema.type == types_1.SchemaType.EEW_INFORMATION) {
             const eew_body = decoded_body.body;
@@ -128,10 +131,15 @@ class DMDataWebSocket {
             this.SOCKET = new ws_1.WebSocket(`wss://${options.region || types_1.WebSocketRegion.AUTOMATIC}.api.dmdata.jp/v2/websocket?ticket=${ticket === null || ticket === void 0 ? void 0 : ticket.ticket}`);
             this.SOCKET.on('message', (msg) => this.handleMessage(msg.toString()));
             this.SOCKET.on('close', () => {
+                this.emitter.emit(types_1.WebSocketEvent.CLOSED);
+                // automatically reconnect (or at least try to)
+                const reconnect = () => {
+                    this.OpenSocket(options);
+                    setTimeout(reconnect, 5000);
+                };
+                reconnect();
                 if (!this.is_active)
                     return;
-                this.emitter.emit(types_1.WebSocketEvent.CLOSED);
-                this.is_active = false;
             });
             this.emit(types_1.WebSocketEvent.OPENED);
         });
@@ -140,6 +148,7 @@ class DMDataWebSocket {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.is_active)
                 return this.logger.warn('CloseSocket() was called, but no socket is currently active.');
+            this.is_active = false;
             this.SOCKET.close();
         });
     }

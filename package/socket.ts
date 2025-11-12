@@ -86,11 +86,13 @@ export class DMDataWebSocket {
         // must decode body first
         const decoded_body = DecompressData(data.body);
 
-        this.logger.debug('body decompressed to -> ' + JSON.stringify(decoded_body));
+        if (this.debug) this.logger.debug('body decompressed to -> ' + JSON.stringify(decoded_body));
 
         // final report of an earthquake (jquake says the line)
-        if (decoded_body._schema.type == SchemaType.EARTHQUAKE_INFORMATION) 
+        if (decoded_body._schema.type == SchemaType.EARTHQUAKE_INFORMATION) {
+            decoded_body.body.eventId = decoded_body.eventId;
             this.emitter.emit(WebSocketEvent.EARTHQUAKE_REPORT, decoded_body.body as EarthquakeInformationSchemaBody);
+        }
 
         // eew-information is issued, can be either warning or forecast
         if (decoded_body._schema.type == SchemaType.EEW_INFORMATION) {
@@ -141,9 +143,14 @@ export class DMDataWebSocket {
 
         this.SOCKET.on('message', (msg) => this.handleMessage(msg.toString()));
         this.SOCKET.on('close', () => { 
-            if (!this.is_active) return;
             this.emitter.emit(WebSocketEvent.CLOSED);
-            this.is_active = false; 
+            // automatically reconnect (or at least try to)
+            const reconnect = () => {
+                this.OpenSocket(options);
+                setTimeout(reconnect, 5_000);
+            };
+            reconnect();
+            if (!this.is_active) return;
         });
 
         this.emit(WebSocketEvent.OPENED);
@@ -152,6 +159,7 @@ export class DMDataWebSocket {
     public async CloseSocket() {
         if (!this.is_active) return this.logger.warn('CloseSocket() was called, but no socket is currently active.');
 
+        this.is_active = false;
         this.SOCKET.close();
     }
 

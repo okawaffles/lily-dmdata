@@ -4,6 +4,7 @@ import { EEW_TYPE, LAND_OR_SEA, ShindoValue } from "./types";
  * earthquake-information Data Schema (decoded_body.body)
  */
 export interface EarthquakeInformationSchemaBody extends DefaultComponent {
+    eventId: string;
     earthquake: EarthquakeComponent;
     intensity: IntensityComponent;
     comments: CommentsComponent;

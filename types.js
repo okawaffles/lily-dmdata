@@ -44,6 +44,7 @@ var WebSocketEvent;
 (function (WebSocketEvent) {
     WebSocketEvent["OPENED"] = "open";
     WebSocketEvent["CLOSED"] = "close";
+    WebSocketEvent["RECONNECTING"] = "reconnecting";
     WebSocketEvent["START"] = "start";
     WebSocketEvent["PING"] = "ping";
     WebSocketEvent["EARTHQUAKE_REPORT"] = "earthquake_report";

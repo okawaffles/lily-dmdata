@@ -40,6 +40,7 @@ export enum DataTypeCode {
 export enum WebSocketEvent {
     OPENED = 'open',
     CLOSED = 'close',
+    RECONNECTING = 'reconnecting',
     START = 'start',
     PING = 'ping',
     EARTHQUAKE_REPORT = 'earthquake_report',
